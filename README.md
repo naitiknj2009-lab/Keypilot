@@ -27,7 +27,51 @@ Designed and optimized specifically for **Android 10 (API 29)** on tablets such 
 
 ---
 
-## 2. System-Wide Cursor Implementation & Platform Analysis
+## 2. Build APK Automatically (GitHub Actions CI/CD)
+
+Whenever code is pushed to your GitHub repository or synchronized from Google AI Studio, a GitHub Actions workflow (`.github/workflows/build-apk.yml`) triggers automatically to compile the Android project and publish a ready-to-install debug APK artifact.
+
+> **Note:** GitHub Actions builds and packages a downloadable APK artifact file in the cloud; it does not directly push or install the file onto your physical tablet. Follow the download and installation steps below.
+
+### How the Automatic Build Works
+
+1. **Push Code:** Commit and push your changes to any branch on GitHub (or use the **Run workflow** button under GitHub Actions for a manual build).
+2. **Automated Pipeline Execution:**
+   - GitHub Actions checks out the repository.
+   - Sets up Eclipse Temurin Java JDK 17.
+   - Configures the Android SDK and required build tools.
+   - Prepares the debug keystore for signing.
+   - Executes `./gradlew --no-daemon :app:assembleDebug`.
+   - Verifies that the APK exists and is non-empty.
+   - Packages and uploads `KeyPilot-debug-apk` as a workflow artifact.
+
+### How to Download and Install the Generated APK
+
+1. **Open GitHub Actions:**
+   - Navigate to your repository on [GitHub](https://github.com).
+   - Click on the **Actions** tab at the top.
+2. **Select the Workflow Run:**
+   - Click on the latest run under **Build KeyPilot APK** (with a green checkmark).
+3. **Download the Artifact:**
+   - Scroll down to the **Artifacts** section at the bottom of the summary page.
+   - Click on **KeyPilot-debug-apk** to download the ZIP archive.
+4. **Extract the ZIP:**
+   - Extract the downloaded `KeyPilot-debug-apk.zip` on your computer or tablet. Inside you will find `app-debug.apk`.
+5. **Transfer to Lenovo Tab M10:**
+   - Connect the tablet to your computer via USB cable, or transfer the APK via Google Drive / USB OTG flash drive.
+   - Place `app-debug.apk` in the tablet's **Downloads** folder.
+6. **Install on Android 10:**
+   - Open the **Files** app on your Lenovo Tab M10.
+   - Tap on `app-debug.apk`.
+   - If prompted with *"Install unknown apps"*, tap **Settings** and toggle **"Allow from this source"**.
+   - Tap **Install** and then **Open**.
+
+### Debug APK vs. Production Release APK
+- The automated workflow builds a **Debug APK** signed with standard Android debug credentials. Debug APKs allow seamless testing, sideloading, and iteration without exposing private production keystore passwords or certificates in the repository.
+
+---
+
+## 3. System-Wide Cursor Implementation & Platform Analysis
 
 ### Android OS Constraint & Transparency Notice
 On stock Android without root access or a privileged system signature, third-party applications **cannot** inject raw Linux kernel mouse events (`InputManager.injectInputEvent()` requires the signature-level `INJECT_EVENTS` permission). 
@@ -42,7 +86,7 @@ On stock Android without root access or a privileged system signature, third-par
 
 ---
 
-## 3. Architecture & Clean Package Structure
+## 4. Architecture & Clean Package Structure
 
 ```
 com.example/
@@ -82,34 +126,28 @@ com.example/
 
 ---
 
-## 4. Building & Installing
+## 5. Local Manual Build & Installation
 
 ### Prerequisites
 - Android SDK with API 26+ (Target API 34/36)
-- Java 11 or 17
+- Java 17
 - Gradle 8+
 
-### Build Debug APK
-Run the following Gradle command:
+### Build Debug APK Locally
 ```bash
-gradle assembleDebug
+./gradlew --no-daemon :app:assembleDebug
 ```
 The compiled APK will be generated at:
 `app/build/outputs/apk/debug/app-debug.apk`
 
-### Install Directly on Lenovo Tab M10
-1. Enable **Developer Options** and **USB Debugging** on the tablet:
-   - Go to **Settings > About Tablet > Tap "Build Number" 7 times**.
-   - Go to **Settings > System > Developer Options > Enable "USB Debugging"**.
-2. Connect the Lenovo Tab M10 to your computer via USB:
-   ```bash
-   adb install -r app/build/outputs/apk/debug/app-debug.apk
-   ```
-3. Alternatively, transfer `app-debug.apk` directly to the tablet's Downloads folder via USB flash drive or Google Drive and tap to install.
+### Direct Sideload via ADB:
+```bash
+adb install -r app/build/outputs/apk/debug/app-debug.apk
+```
 
 ---
 
-## 5. First-Time Setup on Lenovo Tab M10
+## 6. First-Time Setup on Lenovo Tab M10
 
 1. **Connect Keyboard:** Plug in your USB keyboard via an OTG adapter, or pair a Bluetooth keyboard.
 2. **Open KeyPilot:** Launch KeyPilot from the home screen.
@@ -122,7 +160,7 @@ The compiled APK will be generated at:
 
 ---
 
-## 6. Troubleshooting for Android 10
+## 7. Troubleshooting for Android 10
 
 - **Arrow keys type in text fields instead of moving pointer:**  
   Press `F6` to activate Cursor Mode. When Cursor Mode is active, Arrow keys and Enter are consumed by KeyPilot.
