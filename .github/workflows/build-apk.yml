@@ -1,82 +1,35 @@
-name: Build KeyPilot APK
+name: Compile Kotlin App
 
 on:
   push:
+    branches: [ "main" ]
   pull_request:
-    branches:
-      - main
-  workflow_dispatch:
-
-permissions:
-  contents: read
-
-concurrency:
-  group: android-build-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+    branches: [ "main" ]
 
 jobs:
   build:
-    name: Compile Android APK
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout Code
+      uses: actions/checkout@v4
 
-      - name: Set up Java JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'zulu'
+        java-version: '17'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          api-level: 36
-          build-tools: 36.0.0
-          components: |
-            platform-tools
-            build-tools;36.0.0
-            platforms;android-36
-            cmdline-tools;latest
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
 
-      - name: Configure Gradle
-        uses: gradle/actions/setup-gradle@v4
+    # For Android apps, this builds a debug APK. 
+    # For desktop/standard Kotlin, change 'assembleDebug' to 'build' or 'jar'
+    - name: Build with Gradle
+      run: ./gradlew assembleDebug
 
-      - name: Prepare Debug Keystore
-        run: |
-          if [ -f debug.keystore.base64 ] && [ ! -f debug.keystore ]; then
-            echo "Decoding debug.keystore from repository base64 asset..."
-            base64 -d debug.keystore.base64 > debug.keystore
-          elif [ ! -f debug.keystore ]; then
-            echo "Generating fresh debug keystore..."
-            keytool -genkey -v -keystore debug.keystore -alias androiddebugkey -storepass android -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
-          fi
-
-      - name: Make Gradle wrapper executable
-        run: chmod +x ./gradlew
-
-      - name: Build debug APK
-        run: ./gradlew --no-daemon :app:assembleDebug
-
-      - name: Verify APK Generated
-        run: |
-          APK_FILE=$(find app/build/outputs/apk/debug -name "*.apk" -type f | head -n 1)
-          if [ -z "$APK_FILE" ]; then
-            echo "::error::Build completed but no APK was found in app/build/outputs/apk/debug"
-            exit 1
-          fi
-          if [ ! -s "$APK_FILE" ]; then
-            echo "::error::Generated APK file is empty: $APK_FILE"
-            exit 1
-          fi
-          echo "Successfully verified APK:"
-          ls -lh "$APK_FILE"
-
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: KeyPilot-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
-          if-no-files-found: error
-          retention-days: 14
+    - name: Upload Compiled Binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: Compiled-App
+        path: app/build/outputs/apk/debug/app-debug.apk
