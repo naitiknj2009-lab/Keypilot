@@ -1,0 +1,6 @@
+{
+  "name": "KeyPilot",
+  "description": "Keyboard-to-mouse controller for Android 10 with customizable key mappings, virtual cursor overlay, and accessibility gesture click injection.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

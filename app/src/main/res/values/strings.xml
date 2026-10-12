@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">KeyPilot</string>
+    <string name="accessibility_service_label">KeyPilot Cursor Controller</string>
+    <string name="accessibility_service_description">Enables hardware USB and Bluetooth keyboard arrow keys to steer a responsive virtual cursor and perform accessibility click and navigation gestures across the Android system.</string>
+    
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_keyboard_setup">Key Setup</string>
+    <string name="nav_cursor_test">Cursor Test</string>
+    <string name="nav_settings">Settings</string>
+    <string name="nav_onboarding">Setup Guide</string>
+</resources>
