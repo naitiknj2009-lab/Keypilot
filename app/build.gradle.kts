@@ -1,4 +1,14 @@
 import com.google.gms.googleservices.GoogleServicesPlugin.MissingGoogleServicesStrategy
+import java.io.File
+
+// Automatically configure sdk.dir from environment variables if local.properties is missing
+val localPropertiesFile = File(rootDir, "local.properties")
+if (!localPropertiesFile.exists()) {
+    val sdkPath = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
+    if (!sdkPath.isNullOrEmpty()) {
+        localPropertiesFile.writeText("sdk.dir=${sdkPath.replace('\\', '/')}\n")
+    }
+}
 
 plugins {
   alias(libs.plugins.android.application)

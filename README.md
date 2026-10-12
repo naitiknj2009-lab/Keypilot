@@ -29,45 +29,24 @@ Designed and optimized specifically for **Android 10 (API 29)** on tablets such 
 
 ## 2. Build APK Automatically (GitHub Actions CI/CD)
 
-Whenever code is pushed to your GitHub repository or synchronized from Google AI Studio, a GitHub Actions workflow (`.github/workflows/build-apk.yml`) triggers automatically to compile the Android project and publish a ready-to-install debug APK artifact.
-
-> **Note:** GitHub Actions builds and packages a downloadable APK artifact file in the cloud; it does not directly push or install the file onto your physical tablet. Follow the download and installation steps below.
+Whenever code is pushed to your GitHub repository or synchronized from Google AI Studio, the GitHub Actions workflow (`.github/workflows/build-apk.yml`) triggers automatically to compile the Android project and publish a ready-to-install debug APK artifact.
 
 ### How the Automatic Build Works
-
 1. **Push Code:** Commit and push your changes to any branch on GitHub (or use the **Run workflow** button under GitHub Actions for a manual build).
 2. **Automated Pipeline Execution:**
    - GitHub Actions checks out the repository.
    - Sets up Eclipse Temurin Java JDK 17.
-   - Configures the Android SDK and required build tools.
+   - Configures the Android SDK and required build tools (using `ANDROID_HOME`/`ANDROID_SDK_ROOT`).
    - Prepares the debug keystore for signing.
    - Executes `./gradlew --no-daemon :app:assembleDebug`.
    - Verifies that the APK exists and is non-empty.
-   - Packages and uploads `KeyPilot-debug-apk` as a workflow artifact.
+   - Packages and uploads `KeyPilot-debug-apk` as a workflow artifact (retained for 14 days).
 
 ### How to Download and Install the Generated APK
-
-1. **Open GitHub Actions:**
-   - Navigate to your repository on [GitHub](https://github.com).
-   - Click on the **Actions** tab at the top.
-2. **Select the Workflow Run:**
-   - Click on the latest run under **Build KeyPilot APK** (with a green checkmark).
-3. **Download the Artifact:**
-   - Scroll down to the **Artifacts** section at the bottom of the summary page.
-   - Click on **KeyPilot-debug-apk** to download the ZIP archive.
-4. **Extract the ZIP:**
-   - Extract the downloaded `KeyPilot-debug-apk.zip` on your computer or tablet. Inside you will find `app-debug.apk`.
-5. **Transfer to Lenovo Tab M10:**
-   - Connect the tablet to your computer via USB cable, or transfer the APK via Google Drive / USB OTG flash drive.
-   - Place `app-debug.apk` in the tablet's **Downloads** folder.
-6. **Install on Android 10:**
-   - Open the **Files** app on your Lenovo Tab M10.
-   - Tap on `app-debug.apk`.
-   - If prompted with *"Install unknown apps"*, tap **Settings** and toggle **"Allow from this source"**.
-   - Tap **Install** and then **Open**.
-
-### Debug APK vs. Production Release APK
-- The automated workflow builds a **Debug APK** signed with standard Android debug credentials. Debug APKs allow seamless testing, sideloading, and iteration without exposing private production keystore passwords or certificates in the repository.
+1. **Open GitHub Actions:** Navigate to your repository on GitHub and click the **Actions** tab.
+2. **Select the Workflow Run:** Click on the latest run under **Build KeyPilot APK**.
+3. **Download the Artifact:** Scroll down to **Artifacts** and click **KeyPilot-debug-apk** to download the ZIP archive.
+4. **Transfer & Install:** Extract `app-debug.apk`, transfer it to your Lenovo Tab M10 (via USB or Google Drive), tap to install, and allow installation from unknown sources if prompted.
 
 ---
 
@@ -117,7 +96,7 @@ com.example/
     ├── theme/                            # Cyber-Chic Obsidian M3 theme
     └── screens/
         ├── WelcomeScreen.kt              # Onboarding hero & device check
-        ├── DashboardScreen.kt            # Live telemetry, master switch & quick tools
+        ├── DashboardScreen.kt              # Live telemetry, master switch & quick tools
         ├── KeyboardSetupScreen.kt        # Visual D-Pad, key rebind dialog & presets
         ├── CursorTestScreen.kt           # Interactive target test arena
         ├── SettingsScreen.kt             # Speed sliders, cursor styling & haptics
